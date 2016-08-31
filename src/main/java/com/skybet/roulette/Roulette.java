@@ -1,14 +1,16 @@
 package com.skybet.roulette;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.List;
 
 public class Roulette 
 {
 	private int[] numbers;
 	public static final int EUROPEAN_TOTAL = 37;
-	private String[] outsideBetTypes = {"low", "high", "even", "odd", "red", "black", 
-			"dozen1", "dozen2", "dozen3", "column1", "column2", "column3", "basket"};
+	private List<String> outsideBetTypes = Arrays.asList("low", "high", "even", "odd", "red", "black", 
+			"dozen1", "dozen2", "dozen3", "column1", "column2", "column3", "basket");
 	
 	private final Random rnd = new Random();
 	
@@ -106,10 +108,8 @@ public class Roulette
 	}
 
 	private double getInsideBetPayout(String betType, int[] insideBets) {
-		for(int singleBet : insideBets){
-			if(singleBet == currentNumber){
-				return (numbers.length - 1) / insideBets.length;
-			}
+		if(Arrays.stream(insideBets).anyMatch(singleBet -> singleBet == currentNumber)){
+			return (numbers.length - 1) / insideBets.length;
 		}
 		return 0;
 	}
@@ -120,10 +120,7 @@ public class Roulette
 	 * @return True if it is an outside bet
 	 */
 	private boolean isOutsideBet(String betType) {
-		for(String bt : outsideBetTypes){
-			if(betType.equals(bt))	return true;
-		}
-		return false;
+		return outsideBetTypes.stream().anyMatch(bt -> betType.equals(bt));
 	}
 
 	/**
@@ -150,23 +147,21 @@ public class Roulette
 				return 2;
 			break;
 		case "red":
-			int[] redNumbers = {1, 3, 5, 7, 9, 12,
+			List<Integer> redNumbers = Arrays.asList(
+							    1, 3, 5, 7, 9, 12,
 								14, 16, 18, 19, 21, 23,
-								25, 27, 30, 32, 34, 36}; 
-			for(int redNumber : redNumbers){
-				if(currentNumber == redNumber)
-					return 2;
+								25, 27, 30, 32, 34, 36); 
+			if(redNumbers.stream().anyMatch(redNumber -> currentNumber == redNumber)){
+				return 2;
 			}
 			break;
 		case "black":
-			int[] blackNumbers = {2, 4, 6, 8, 10, 11,
+			List<Integer> blackNumbers = Arrays.asList(
+								  2, 4, 6, 8, 10, 11,
 								  13, 15, 17, 20, 22, 24,
-								  26, 28, 29, 31, 33, 35}; 
-			for(int blackNumber : blackNumbers){
-				if(blackNumber > currentNumber)		
-					break;
-				if(currentNumber == blackNumber)
-					return 2;
+								  26, 28, 29, 31, 33, 35); 
+			if(blackNumbers.stream().anyMatch(blackNumber -> currentNumber == blackNumber)){
+				return 2;
 			}
 			break;
 		case "dozen1":
@@ -216,7 +211,7 @@ public class Roulette
 	 * @return all possible outside bet types
 	 */
 	public String[] getOutsideBetTypes() {
-		return outsideBetTypes;
+		return (String[]) outsideBetTypes.toArray();
 	}
 
 
